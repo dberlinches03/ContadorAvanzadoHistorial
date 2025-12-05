@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.example.contadoravanzadohistorial.ui.theme.ContadorAvanzadoHistorialTheme
 
 class MainActivity : ComponentActivity() {
@@ -42,9 +43,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Contador(modifier: Modifier = Modifier) {
-    var contador by remember { mutableStateOf(0) }
-    val listaOperaciones = remember { mutableStateListOf<String>() }
+fun Contador(
+    modifier: Modifier = Modifier,
+    viewModel: ContadorViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     Column (
         Modifier.fillMaxSize()
             .padding(8.dp),
@@ -54,43 +56,27 @@ fun Contador(modifier: Modifier = Modifier) {
     ) {
         Text("Contador de operaciones")
         Spacer(modifier = Modifier.padding(8.dp))
-        Text(
-            text = "Resultado: $contador",
-            modifier = modifier
-
-        )
+        Text(text = "Resultado: ${viewModel.contador.value}")
         Spacer(modifier = Modifier.padding(8.dp))
 
         Row {
-            Button(onClick = {
-                contador++
-                listaOperaciones.add("+1 -> contador = $contador")
-            }){
-                Text("Sumar")
-            }
+            Button(onClick = { viewModel.sumar() }) { Text("Sumar") }
+
             Spacer(modifier = Modifier.padding(8.dp))
-            Button(onClick = {
-                contador--
-                listaOperaciones.add("-1 -> contador = $contador")
-            }) {
-                Text("Restar")
-            }
+
+            Button(onClick = { viewModel.restar() }) { Text("Restar") }
+
             Spacer(modifier = Modifier.padding(8.dp))
-            Button(onClick = {
-                contador = 0
-                listaOperaciones.add("Reinicio -> contador = $contador")
-            }){
-                Text("Reiniciar")
-            }
+
+            Button(onClick = { viewModel.reiniciar() }){ Text("Reiniciar") }
         }
         Spacer(modifier = Modifier.padding(8.dp))
         Text("Historial de operaciones")
-        listaOperaciones.forEach { operacion ->
+        viewModel.historial.forEach { operacion ->
             Text(operacion)
         }
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun ContadorPreview() {
